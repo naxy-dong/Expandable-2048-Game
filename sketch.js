@@ -8,14 +8,6 @@ let scoreHeight = 96
 let lineHeight = 85;
 let row;
 
-function setup() {
-    createCanvas(canvasWidth, canvasHeight);
-    
-    newGame();
-    updateGame() 
-   
-    console.log(grid)
-  }
 
 function newGame(){
   gridSize = 2
@@ -32,21 +24,26 @@ function drawGrid() {
       strokeWeight(4);
       stroke(51);
       fill(150,200,250)
+      
       rect(cellSize * col + 4, cellSize * row + scoreHeight, cellSize, cellSize, 20); 
       let index = row * gridSize + col
-      
+      const seed = min(map(pow(grid[index], 1 / 11), 1, 2, 1, 200), 200);
       if( grid[index] != 0){
         const msg = `${grid[index]}`;
+        const r =  map(seed, 1, 200, 0, 255);
+		const g = map(seed, 1, 200, 150, 255);
+		const b = map(seed, 1, 200, 0, 30);
         //const size = floor(map(sqrt(msg.length), 1, 3, 64, 14));
-        const size = floor(map(sqrt(msg.length), 1, 3, cellSize, 14));
-        drawText(grid[index], color(45,240,44), size ,cellSize * col + cellSize/2 + 4 ,cellSize * row + scoreHeight + cellSize/2)
+        const size = floor(map(sqrt(msg.length), 1, 3, cellSize*0.80, 14));
+        //drawText(grid[index], color(45,240,44), size ,cellSize * col + cellSize/2 + 4 ,cellSize * row + scoreHeight + cellSize/2)
+        drawText(grid[index], color(r, g, b), size ,cellSize * col + cellSize/2 + 4 ,cellSize * row + scoreHeight + cellSize/2)
       }
     }
   }
 }
 
 function keyPressed(){
-  console.log(keyCode)
+  //console.log(keyCode)
   switch(keyCode){
     case 40: //down
     case 38: //up
@@ -88,7 +85,7 @@ function checkSlide(past) {
 	if (!movesLeft()) {
       gameOver = true;
       gridSize = gridSize + 1
-      cellSize = canvasWidth/gridSize - 10;
+      cellSize = (canvasWidth-8)/gridSize;
 	}
 }
   
@@ -152,7 +149,8 @@ function combine(row,direction){
 		case LEFT_ARROW:
 			return combineUpLeft(row);
   }
-	}
+}
+  
 function combineUpLeft(row) {
 	const forStart = 0;
 	return combineRow(row, forStart, (i, x) => i < x - 1, i => i + 1);
@@ -174,7 +172,10 @@ function combineRow(row, forStart, forCond, forIncr) {
 		}
 		if (a === b && a !== 0) {
 			row[i] = a + b;
-			score += row[i];
+            if(!isNaN(row[i])){
+              score += row[i];
+            }
+			  
 			row[idx] = 0;
 			if (row[i] === 2048) {
 				completed = true;
@@ -191,6 +192,7 @@ function drawScore(){
   noStroke()
   drawText(`Score: ${score}`,color(149, 0, 255), 40, gridSize * cellSize/2, 67)
 }
+  
 function drawText(message, color, size, x, y){
   textAlign(CENTER,CENTER)
   textSize(size)
@@ -210,9 +212,9 @@ function addNumber(){
       
     }
   }
-  console.log(options)
+  //console.log(options)
   let randomNumber = floor(random(options.length))
-  console.log(randomNumber)
+  //console.log(randomNumber)
   
   
 let  newRandomNum=random(1) 
@@ -225,9 +227,16 @@ result = newRandomNum < 0.5 ? 2 : 4;
   
 function updateGame(){
   background(220)
-  drawScore()
+
   drawGrid()
-  
+  drawScore()
 }
   
-
+function setup() {
+  createCanvas(canvasWidth, canvasHeight);
+  
+  newGame();
+  updateGame() 
+ 
+  //console.log(grid)
+}
